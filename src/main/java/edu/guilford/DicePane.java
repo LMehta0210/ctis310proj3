@@ -24,6 +24,8 @@ public class DicePane extends GridPane{
     private Label sumLabel;
 
     //roll button
+    //Step 1: Declare button
+    //Step 2: Instantiate button
     private Button rollButton = new Button("Roll");
 
     //array of keep checkboxes
@@ -44,7 +46,7 @@ public class DicePane extends GridPane{
         File rollIcon = new File(this.getClass().getResource("dice.gif").getPath());
         this.rollingImageView = new ImageView(rollIcon.toURI().toString());
 
-        //add the roll button to the pane
+        //Step 3: add the roll button to the pane
         this.add(this.rollButton, 0, 0);
 
         //add the sum label to the pane
@@ -69,6 +71,7 @@ public class DicePane extends GridPane{
             this.add(this.keepCheckBoxes[i], 1, i + 2);
         }
 
+        //Step 4 and 5: add an event listener and connect it to the component
         //add an action listener to the roll button
         this.rollButton.setOnAction(e -> {
             //rool each die if keep is not checked
