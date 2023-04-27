@@ -1,8 +1,12 @@
 package edu.guilford;
 
+import java.io.File;
+
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 public class DicePane extends GridPane{
@@ -11,64 +15,86 @@ public class DicePane extends GridPane{
     private Die[] dice;
 
     //array of TextField for face values and number of sides
-    private TextField[] dieNumSidesFields;
+    private TextField dieNumSidesField = new TextField();
 
     //array of Labels
     private Label[] dieFaceLabels;
-    private Label[] dieNumSidesLabels;
 
+    private Label dieNumSidesLabel;
     private Label sumLabel;
 
     //roll button
     private Button rollButton = new Button("Roll");
 
+    //array of keep checkboxes
+    private CheckBox[] keepCheckBoxes;
+
+    //ImageView attribute
+    private ImageView rollingImageView;
+
     //constructors
     public DicePane(Die[] dice) {
         this.dice = dice;
-        this.dieNumSidesFields = new TextField[dice.length];
         this.dieFaceLabels = new Label[dice.length];
-        this.dieNumSidesLabels = new Label[dice.length];
         this.sumLabel = new Label("Sum: " + this.sum());
+        this.dieNumSidesLabel = new Label("Number of Sides: " + dice[0].getNumSides());
+        this.keepCheckBoxes = new CheckBox[dice.length];
+
+        //Instantiate the imageView with image we want
+        File rollIcon = new File(this.getClass().getResource("dice.gif").getPath());
+        this.rollingImageView = new ImageView(rollIcon.toURI().toString());
 
         //add the roll button to the pane
         this.add(this.rollButton, 0, 0);
 
         //add the sum label to the pane
-        this.add(this.sumLabel, 1, 0);
+        this.add(this.sumLabel, 0, 1);
+        //add the number of sides label to the pane
+        this.add(this.dieNumSidesLabel, 1, 0);
+        //add the number of sides text field to the pane
+        this.add(this.dieNumSidesField, 1, 1);
 
-        //add the labels and text fields for each die
+        //add the rolling image view to the pane
+        this.add(this.rollingImageView, 2, 0, 3, 10);
+
+        //add the labels and keep checkboxes for each die
         for (int i = 0; i < dice.length; i++) {
             //create a label for the face value
             this.dieFaceLabels[i] = new Label("Face Value: " + dice[i].getFaceValue());
             //add the label to the pane
-            this.add(this.dieFaceLabels[i], 0, i + 1);
-
-            //create a label for the number of sides
-            this.dieNumSidesLabels[i] = new Label("Number of Sides: " + dice[i].getNumSides());
-            //add the label to the pane
-            this.add(this.dieNumSidesLabels[i], 1, i + 1);
-
-            //create a text field for the number of sides
-            this.dieNumSidesFields[i] = new TextField("" + dice[i].getNumSides());
-            //add the text field to the pane
-            this.add(this.dieNumSidesFields[i], 2, i + 1);
+            this.add(this.dieFaceLabels[i], 0, i + 2);
+            //create Checkbox
+            this.keepCheckBoxes[i] = new CheckBox("Keep");
+            //add the checkbox to the pane
+            this.add(this.keepCheckBoxes[i], 1, i + 2);
         }
 
         //add an action listener to the roll button
         this.rollButton.setOnAction(e -> {
-            //roll each die
-            for (Die die : this.dice) {
-                die.roll();
-            }
-
-            //update the labels
+            //rool each die if keep is not checked
             for (int i = 0; i < dice.length; i++) {
-                this.dieFaceLabels[i].setText("Face Value: " + dice[i].getFaceValue());
-                this.dieNumSidesLabels[i].setText("Number of Sides: " + dice[i].getNumSides());
+                if (!this.keepCheckBoxes[i].isSelected()) {
+                    dice[i].roll();
+                    this.dieFaceLabels[i].setText("Face Value: " + dice[i].getFaceValue());
+                }
             }
 
             //update the sum label
             this.sumLabel.setText("Sum: " + this.sum());
+        });
+
+        //add an action listener to the number of sides text field
+        this.dieNumSidesField.setOnAction(e -> {
+            //get the number of sides from the text field
+            int numSides = Integer.parseInt(this.dieNumSidesField.getText());
+
+            //set the number of sides for each die
+            for (Die die : this.dice) {
+                die.setNumSides(numSides);
+            }
+
+            //update the number of sides label
+            this.dieNumSidesLabel.setText("Number of Sides: " + dice[0].getNumSides());
         });
 
         //Give the pane a border
