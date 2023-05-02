@@ -9,32 +9,32 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-public class DicePane extends GridPane{
-    //attributes
-    //Array of dice
+public class DicePane extends GridPane {
+    // attributes
+    // Array of dice
     private Die[] dice;
 
-    //array of TextField for face values and number of sides
+    // array of TextField for face values and number of sides
     private TextField dieNumSidesField = new TextField();
 
-    //array of Labels
+    // array of Labels
     private Label[] dieFaceLabels;
 
     private Label dieNumSidesLabel;
     private Label sumLabel;
 
-    //roll button
-    //Step 1: Declare button
-    //Step 2: Instantiate button
+    // roll button
+    // Step 1: Declare button
+    // Step 2: Instantiate button
     private Button rollButton = new Button("Roll");
 
-    //array of keep checkboxes
+    // array of keep checkboxes
     private CheckBox[] keepCheckBoxes;
 
-    //ImageView attribute
+    // ImageView attribute
     private ImageView rollingImageView;
 
-    //constructors
+    // constructors
     public DicePane(Die[] dice) {
         this.dice = dice;
         this.dieFaceLabels = new Label[dice.length];
@@ -88,16 +88,25 @@ public class DicePane extends GridPane{
 
         //add an action listener to the number of sides text field
         this.dieNumSidesField.setOnAction(e -> {
-            //get the number of sides from the text field
-            int numSides = Integer.parseInt(this.dieNumSidesField.getText());
+            try{    
+                //get the number of sides from the text field
+                int numSides = Integer.parseInt(this.dieNumSidesField.getText());
+                if (numSides<1){
+                    throw new InvalidNumberOfSidesException("Number of sides must be greater than 0");
+                }
+                //set the number of sides for each die
+                for (Die die : this.dice) {
+                    die.setNumSides(numSides);
+                }
 
-            //set the number of sides for each die
-            for (Die die : this.dice) {
-                die.setNumSides(numSides);
+                //update the number of sides label
+                this.dieNumSidesLabel.setText("Number of Sides: " + dice[0].getNumSides());
+
+            } catch (NumberFormatException ex) {
+                System.out.println("Please enter an integer number of sides");
+            } catch (InvalidNumberOfSidesException ex){
+                System.out.println(ex.getMessage());
             }
-
-            //update the number of sides label
-            this.dieNumSidesLabel.setText("Number of Sides: " + dice[0].getNumSides());
         });
 
         //Give the pane a border
@@ -107,13 +116,20 @@ public class DicePane extends GridPane{
 
     }
 
-    //methods
-    //sum
+    // methods
+    // sum
     public int sum() {
         int sum = 0;
         for (Die die : this.dice) {
             sum += die.getFaceValue();
         }
         return sum;
+    }
+
+    //Exception for invalid number of sides
+    public class InvalidNumberOfSidesException extends Exception {
+        public InvalidNumberOfSidesException(String message) {
+            super(message);
+        }
     }
 }
